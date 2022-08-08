@@ -1,24 +1,26 @@
 const express = require('express');
 const multer = require('multer');
+const fs = require('fs');
 
 const router = express.Router();
 const {Book, validateBook} = require('../models/books');
 const Image = require('../models/image');
 
 // Storage
-const Storage = multer.diskStorage({
-    destination: 'uploads',
-    filename:(req,file,cb) => {
-        cb(null, file.originalname);
-    }
-});
+// const storage = multer.diskStorage({
+//     destination: (req,file,cb) => {
+//         cb(null, 'uploads');
+//     },
+//     filename: (req, res, cb) => {
+//         cb(null ,file.originalName)
+//     }
+// })
 
-const upload = multer({
-    storage: Storage
-}).single('image');
+// const upload = multer({storage: storage});
 
 // POST: Create a new book
-router.post('/', async (req, res) => {
+router.post("/",  /*upload.single('image'), */async (req, res) => {
+    console.log(req.body)
     const message = await validateBook(req.body);
 
     if ( message.message ) {
@@ -26,30 +28,27 @@ router.post('/', async (req, res) => {
         return
     }
 
-    upload(req, res, (err) => {
-        if (err) {
-            console.log(err)
-            return
-        } else {
-            book = new Book({
-                name:req.body.bookName,
-                author: {
-                    name:req.body.authorName,
-                    age:req.body.authorAge
-                },
-                genre:req.body.genre,
-                image: {
-                    name:req.file.filename,
-                    contentType: 'image/png'
-                }
-            });
-        }
-    })
+    // const saveImage = new Image({
+    //     name:request.body.imageName,
+    //     image: {
+    //         data:fs.readFileSync('uploads/', req.file.filename),
+    //         contentType: 'image/png'
+    //     }
+    // });
+
+    book = new Book({
+        name:req.body.bookName,
+        author: {
+            name:req.body.authorName,
+            age:req.body.authorAge
+        },
+        genre:req.body.genre
+    });
 
     book.save().then(book => {
         res.send(book);
     }).catch(error => {
-        res.status(500).send("Book was not stored in db");
+        res.status(500).send(error);
     });
 });
 

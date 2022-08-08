@@ -1,8 +1,11 @@
 const express = require('express');
+const app = express(); 
 const mongoose = require('mongoose');
+const multer = require('multer');
 const booksRoute = require('./routes/books');
 const winston = require('winston');
-const app = express();
+const bodyParser = require('body-parser');
+const cors = require('cors');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
@@ -10,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.use(cors());
 
 // Create a logger
 const logger = winston.createLogger({
