@@ -1,6 +1,21 @@
 const express = require('express');
+const multer = require('multer');
+
 const router = express.Router();
 const {Book, validateBook} = require('../models/books');
+const Image = require('../models/image');
+
+// Storage
+const Storage = multer.diskStorage({
+    destination: 'uploads',
+    filename:(req,file,cb) => {
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({
+    storage: Storage
+}).single('image');
 
 // POST: Create a new book
 router.post('/', async (req, res) => {
@@ -11,14 +26,25 @@ router.post('/', async (req, res) => {
         return
     }
 
-    book = new Book({
-        name:req.body.bookName,
-        author: {
-            name:req.body.authorName,
-            age:req.body.authorAge
-        },
-        genre:req.body.genre
-    });
+    upload(req, res, (err) => {
+        if (err) {
+            console.log(err)
+            return
+        } else {
+            book = new Book({
+                name:req.body.bookName,
+                author: {
+                    name:req.body.authorName,
+                    age:req.body.authorAge
+                },
+                genre:req.body.genre,
+                image: {
+                    name:req.file.filename,
+                    contentType: 'image/png'
+                }
+            });
+        }
+    })
 
     book.save().then(book => {
         res.send(book);

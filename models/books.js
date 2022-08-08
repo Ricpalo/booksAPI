@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
-const Author = require('./author');
 const yup = require('yup');
+
+const Author = require('./author');
+const Image = require('./image');
 
 const BookSchema = new mongoose.Schema({
     name: {
@@ -15,7 +17,8 @@ const BookSchema = new mongoose.Schema({
         required:true,
         minlength:3,
         maxlength:20
-    }
+    },
+    image: Image.schema
 });
 
 const validateBook = book => {
